@@ -16,13 +16,21 @@ var io = require('socket.io')(http, {
  * Configure Socket.IO to listen for new connections.
  */
 io.on('connection', function(socket) {
-    socket.emit('onopen', true);
+    try {
+        socket.emit('onopen', true);
+    } catch (err) {
+        console.error(err);
+    }
 
     // Receive the name of the channel in the connection event
     socket.on('join_channel', function(canal) {
-        console.log(`A new user joined the channel: ${canal}`);
-        // Add the client to the corresponding channel
-        socket.join(canal);
+        try {
+            console.log(`A new user joined the channel: ${canal}`);
+            // Add the client to the corresponding channel
+            socket.join(canal);
+        } catch (err) {
+            console.error(err);
+        }
     });
 
     /*
@@ -32,12 +40,15 @@ io.on('connection', function(socket) {
      * @param msj : The data sent from the client through the socket.
      */
     socket.on('new_message', function(data) {
-        const regexForStripHTML = /<.*>.*?/ig;
-        data.msj = data.msj.replaceAll(regexForStripHTML, '');
-
-        if (data.msj !== '' && data.username !== '') {
-            console.log(`${data.username} wrote a new message in ${data.canal}`);
-            io.to(data.canal).emit('new_message', data.username, data.msj);
+        try {
+            const regexForStripHTML = /<.*>.*?/ig;
+            data.msj = data.msj.replace(regexForStripHTML, '');
+            if (data.msj !== '' && data.username !== '') {
+                console.log(`${data.username} wrote a new message in ${data.canal}`);
+                io.to(data.canal).emit('new_message', data.username, data.msj);
+            }
+        } catch (err) {
+            console.error(err);
         }
     });
 
@@ -45,13 +56,17 @@ io.on('connection', function(socket) {
      * Print to console every time a user disconnects from the system.
      */
     socket.on('disconnect', function() {
-        console.log('User disconnected');
+        try {
+            console.log('User disconnected');
+        } catch (err) {
+            console.error(err);
+        }
     });
 });
 
 /*
- * Start the application on port 3000
+ * Start the application on port 80
  */
-http.listen(3000, function() {
-    console.log('listening on *:3000');
+http.listen(80, function() {
+    console.log('listening on *:80');
 });
