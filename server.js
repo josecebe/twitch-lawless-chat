@@ -7,7 +7,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http, {
     cors: {
-        origin: 'https://www.twitch.tv',
+        origin: /^https?:\/\/(?:www\.)?twitch\.tv\/?.*$/,
         methods: ['GET', 'POST']
     }
 });
